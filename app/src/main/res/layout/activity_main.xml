@@ -11,19 +11,92 @@
         android:id="@+id/reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="184dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="153dp"
         android:onClick="reset"
         android:text="Wyczyść dane"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/synchro"
+        app:layout_constraintTop_toBottomOf="@+id/synchro" />
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/hello"
+        android:layout_width="66dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="98dp"
+        android:layout_marginBottom="33dp"
+        android:text="Cześć"
+        app:layout_constraintBottom_toTopOf="@+id/gamesNumber"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/synchro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cześć"
-        tools:layout_editor_absoluteX="81dp"
-        tools:layout_editor_absoluteY="72dp" />
+        android:layout_marginBottom="38dp"
+        android:onClick="synchronise"
+        android:text="synchronizacja"
+        app:layout_constraintBottom_toTopOf="@+id/reset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateSynchro" />
+
+    <Button
+        android:id="@+id/toExtensions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="23dp"
+        android:onClick="viewExtensions"
+        android:text="zobacz dodatki"
+        app:layout_constraintBottom_toTopOf="@+id/dateSynchro"
+        app:layout_constraintStart_toStartOf="@+id/synchro"
+        app:layout_constraintTop_toBottomOf="@+id/extensionNumber" />
+
+    <Button
+        android:id="@+id/toGames"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginBottom="31dp"
+        android:onClick="viewGames"
+        android:text="zobacz gry"
+        app:layout_constraintBottom_toTopOf="@+id/extensionNumber"
+        app:layout_constraintStart_toStartOf="@+id/toExtensions"
+        app:layout_constraintTop_toBottomOf="@+id/gamesNumber" />
+
+    <TextView
+        android:id="@+id/extensionNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="11dp"
+        android:layout_marginBottom="32dp"
+        android:text="Liczba dodatków"
+        app:layout_constraintBottom_toTopOf="@+id/toExtensions"
+        app:layout_constraintStart_toStartOf="@+id/toGames"
+        app:layout_constraintTop_toBottomOf="@+id/toGames" />
+
+    <TextView
+        android:id="@+id/gamesNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="31dp"
+        android:text="Liczba gier"
+        app:layout_constraintBottom_toTopOf="@+id/toGames"
+        app:layout_constraintStart_toStartOf="@+id/toGames"
+        app:layout_constraintTop_toBottomOf="@+id/hello" />
+
+    <TextView
+        android:id="@+id/dateSynchro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="19dp"
+        android:layout_marginBottom="24dp"
+        android:text="Data synchronizacji:"
+        app:layout_constraintBottom_toTopOf="@+id/synchro"
+        app:layout_constraintEnd_toEndOf="@+id/toExtensions"
+        app:layout_constraintTop_toBottomOf="@+id/toExtensions" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
+import android.widget.TextView
+import java.security.cert.Extension
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity() {
         }
         else {
             setContentView(R.layout.activity_main)
+            val hello: TextView = findViewById(R.id.hello)
+            hello.text = "Cześć, " + username.toString()
         }
     }
     fun reset(v: View){
@@ -27,5 +30,20 @@ class MainActivity : AppCompatActivity() {
         editor.putString("username", null)
         editor.apply()
         finishAffinity()
+    }
+    fun synchronise(v: View){
+        val intent = Intent(this, SynchronizationActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+    fun viewGames(v: View){
+        val intent = Intent(this, GamesActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+    fun viewExtensions(v: View){
+        val intent = Intent(this, ExtensionActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
