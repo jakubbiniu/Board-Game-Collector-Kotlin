@@ -25,25 +25,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun reset(v: View){
-        val sharedPreferences = getSharedPreferences("your_preference_name", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("username", null)
+        editor.remove("username")
         editor.apply()
         finishAffinity()
     }
     fun synchronise(v: View){
         val intent = Intent(this, SynchronizationActivity::class.java)
         startActivity(intent)
-        finish()
     }
     fun viewGames(v: View){
         val intent = Intent(this, GamesActivity::class.java)
         startActivity(intent)
-        finish()
     }
     fun viewExtensions(v: View){
         val intent = Intent(this, ExtensionActivity::class.java)
         startActivity(intent)
-        finish()
     }
 }
