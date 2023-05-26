@@ -33,8 +33,8 @@ class ConfigurationActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun parseXmlResponse(xmlResponse: String?): GameCollection {
-        val gameCollection = GameCollection()
+    private fun parseXmlResponse(xmlResponse: String?): List<Game> {
+        val games = mutableListOf<Game>()
 
         try {
             val factory = XmlPullParserFactory.newInstance()
@@ -55,10 +55,35 @@ class ConfigurationActivity : AppCompatActivity() {
                         } else if (currentGame != null) {
                             when (tagName) {
                                 "name" -> {
-                                    val attributeValue = parser.getAttributeValue(null, "value")
-                                    currentGame.name = attributeValue ?: ""
+                                    val name = parser.getAttributeValue(null, "value")
+                                    if (!name.isNullOrBlank()) {
+                                        currentGame.name = name
+                                    }
                                 }
-                                // Add other game attributes as needed
+                                "thumbnail" -> {
+                                    val thumbnail = parser.getAttributeValue(null, "value")
+                                    if (!thumbnail.isNullOrBlank()) {
+                                        currentGame.thumbnail = thumbnail
+                                    }
+                                }
+                                "image" -> {
+                                    val image = parser.getAttributeValue(null, "value")
+                                    if (!image.isNullOrBlank()) {
+                                        currentGame.image = image
+                                    }
+                                }
+                                "description" -> {
+                                    val description = parser.getAttributeValue(null, "value")
+                                    if (!description.isNullOrBlank()) {
+                                        currentGame.description = description
+                                    }
+                                }
+                                "yearpublished" -> {
+                                    val yearPublished = parser.getAttributeValue(null, "value")
+                                    if (!yearPublished.isNullOrBlank()) {
+                                        currentGame.yearPublished = yearPublished.toIntOrNull() ?: 0
+                                    }
+                                }
                             }
                         }
                     }
@@ -66,7 +91,7 @@ class ConfigurationActivity : AppCompatActivity() {
                         val tagName = parser.name
 
                         if (tagName == "item" && currentGame != null) {
-                            gameCollection.games.add(currentGame)
+                            games.add(currentGame)
                             currentGame = null
                         }
                     }
@@ -80,7 +105,7 @@ class ConfigurationActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        return gameCollection
+        return games
     }
 
 
@@ -90,12 +115,17 @@ class ConfigurationActivity : AppCompatActivity() {
         games.forEach { game ->
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, game.name)
-            // Insert other game attributes as needed
+            values.put(DatabaseHelper.COLUMN_THUMBNAIL, game.thumbnail)
+            values.put(DatabaseHelper.COLUMN_IMAGE, game.image)
+            values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
+            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
             db.insert(DatabaseHelper.TABLE_NAME, null, values)
         }
 
         db.close()
     }
+
+
 
     fun confirm(v: View) {
         val input: EditText = findViewById(R.id.username)
@@ -107,7 +137,7 @@ class ConfigurationActivity : AppCompatActivity() {
         editor.apply()
 
         GlobalScope.launch(Dispatchers.IO) {
-            val url = "https://boardgamegeek.com/xmlapi2/collection?username=$username"
+            val url = "https://boardgamegeek.com/xmlapi2/collection?username=$username&stats=1"
             val client = OkHttpClient()
             val request = Request.Builder().url(url).build()
 
@@ -116,9 +146,9 @@ class ConfigurationActivity : AppCompatActivity() {
                 val xmlResponse = response.body?.string()
 
                 val gameCollection = parseXmlResponse(xmlResponse)
-                insertGamesIntoDatabase(gameCollection.games)
 
                 runOnUiThread {
+                    insertGamesIntoDatabase(gameCollection)
                     showInfoMessage()
                 }
             } catch (e: IOException) {
@@ -130,4 +160,5 @@ class ConfigurationActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
 }
