@@ -9,6 +9,9 @@ import android.widget.TextView
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var dbHelper: DatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
@@ -17,13 +20,23 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ConfigurationActivity::class.java)
             startActivity(intent)
             finish()
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_main)
             val hello: TextView = findViewById(R.id.hello)
             hello.text = "Hello, " + username.toString()
+
+            // Initialize DatabaseHelper
+            dbHelper = DatabaseHelper(this)
+
+            // Get the number of rows in the database
+            val rowCount = dbHelper.getGamesCount()
+
+            // Update the TextView with the number of rows
+            val rowCountTextView: TextView = findViewById(R.id.gamesNumber)
+            rowCountTextView.text = "Number of games: $rowCount"
         }
     }
+
     fun reset(v: View){
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()

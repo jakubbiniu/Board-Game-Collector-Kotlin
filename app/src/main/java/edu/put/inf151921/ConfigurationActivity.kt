@@ -55,19 +55,19 @@ class ConfigurationActivity : AppCompatActivity() {
                         } else if (currentGame != null) {
                             when (tagName) {
                                 "name" -> {
-                                    val name = parser.getAttributeValue(null, "value")
+                                    val name = parser.nextText()
                                     if (!name.isNullOrBlank()) {
                                         currentGame.name = name
                                     }
                                 }
                                 "description" -> {
-                                    val description = parser.getAttributeValue(null, "value")
+                                    val description = parser.nextText()
                                     if (!description.isNullOrBlank()) {
                                         currentGame.description = description
                                     }
                                 }
                                 "yearpublished" -> {
-                                    val yearPublished = parser.getAttributeValue(null, "value")
+                                    val yearPublished = parser.nextText()
                                     if (!yearPublished.isNullOrBlank()) {
                                         currentGame.yearPublished = yearPublished.toIntOrNull() ?: 0
                                     }
@@ -111,40 +111,55 @@ class ConfigurationActivity : AppCompatActivity() {
         db.close()
     }
 
-
-
     fun confirm(v: View) {
         val input: EditText = findViewById(R.id.username)
         val username: String = input.text.toString()
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("username", username)
-        editor.apply()
+        val cache = sharedPreferences.edit()
+        cache.putString("username", username)
+        cache.apply()
 
         GlobalScope.launch(Dispatchers.IO) {
             val url = "https://boardgamegeek.com/xmlapi2/collection?username=$username&stats=1"
             val client = OkHttpClient()
-            val request = Request.Builder().url(url).build()
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+            var response: Response? = null
 
             try {
-                val response: Response = client.newCall(request).execute()
+                response = client.newCall(request).execute()
                 val xmlResponse = response.body?.string()
 
-                val gameCollection = parseXmlResponse(xmlResponse)
+                if (xmlResponse != null) {
+                    val games = parseXmlResponse(xmlResponse)
 
-                runOnUiThread {
-                    insertGamesIntoDatabase(gameCollection)
-                    showInfoMessage()
+                    if (games.isNotEmpty()) {
+                        dbHelper.onCreate(dbHelper.writableDatabase)
+                        insertGamesIntoDatabase(games)
+
+                        runOnUiThread {
+                            showInfoMessage()
+                            val intent = Intent(applicationContext, MainActivity::class.java)
+                            startActivity(intent)
+                        }
+                    } else {
+                        runOnUiThread {
+                            Toast.makeText(this@ConfigurationActivity, "No games found for the given username.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@ConfigurationActivity, "Failed to retrieve data from the server.", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
+            } finally {
+                response?.body?.close()
             }
         }
-
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
     }
-
 }
