@@ -19,6 +19,8 @@ import java.io.StringReader
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ConfigurationActivity : AppCompatActivity() {
     private val dbHelper: DatabaseHelper by lazy { DatabaseHelper(this) }
@@ -110,14 +112,20 @@ class ConfigurationActivity : AppCompatActivity() {
 
         db.close()
     }
-
+    fun getCurrentDate(): String {
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        return dateFormat.format(calendar.time)
+    }
     fun confirm(v: View) {
         val input: EditText = findViewById(R.id.username)
         val username: String = input.text.toString()
+        val currentDate = getCurrentDate()
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         val cache = sharedPreferences.edit()
         cache.putString("username", username)
+        cache.putString("synchroDate", currentDate)
         cache.apply()
 
         GlobalScope.launch(Dispatchers.IO) {

@@ -26,6 +26,10 @@ class MainActivity : AppCompatActivity() {
             val hello: TextView = findViewById(R.id.hello)
             hello.text = "Hello, " + username.toString()
 
+            var synchroDate = sharedPreferences.getString("synchroDate",null)
+            val date: TextView = findViewById(R.id.dateSynchro)
+            date.text = "Last synchronization date: " + synchroDate.toString()
+
             // Initialize DatabaseHelper
             dbHelper = DatabaseHelper(this)
 
