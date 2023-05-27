@@ -6,12 +6,12 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-<!--    <TextView-->
-<!--        android:id="@+id/number"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textAppearance="?android:textAppearanceMedium"-->
-<!--        android:textColor="@color/white" />-->
+    <TextView
+        android:id="@+id/gameId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/gameName"

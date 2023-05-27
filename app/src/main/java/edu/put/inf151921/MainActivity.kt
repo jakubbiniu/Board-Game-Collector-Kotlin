@@ -1,15 +1,16 @@
 package edu.put.inf151921
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,14 +37,22 @@ class MainActivity : AppCompatActivity() {
             rowCountTextView.text = "Number of games: $rowCount"
         }
     }
-
     fun reset(v: View){
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.remove("username")
-        editor.apply()
-        finishAffinity()
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("Clear Data")
+        dialogBuilder.setMessage("Are you sure you want to clear all data?")
+        dialogBuilder.setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
+            val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.remove("username")
+            editor.apply()
+            finishAffinity()
+        }
+        dialogBuilder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int ->
+        }
+        dialogBuilder.show()
     }
+
     fun synchronise(v: View){
         val intent = Intent(this, SynchronizationActivity::class.java)
         startActivity(intent)

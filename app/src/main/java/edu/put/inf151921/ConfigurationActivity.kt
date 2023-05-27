@@ -144,6 +144,7 @@ class ConfigurationActivity : AppCompatActivity() {
                             showInfoMessage()
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             startActivity(intent)
+                            finish()
                         }
                     } else {
                         runOnUiThread {

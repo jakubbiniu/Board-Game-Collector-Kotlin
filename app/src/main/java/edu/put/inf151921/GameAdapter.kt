@@ -23,6 +23,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
 
         val game = getItem(position)
         game?.let {
+            holder.gameId.text = game.id.toString()
             holder.gameName.text = game.name
             holder.yearPublished.text = game.yearPublished.toString()
             holder.gameDescription.text=game.description
@@ -32,6 +33,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
     }
 
     private class ViewHolder(view: View) {
+        val gameId:TextView = view.findViewById(R.id.gameId)
         val gameName: TextView = view.findViewById(R.id.gameName)
         val yearPublished: TextView = view.findViewById(R.id.yearPublished)
         val gameDescription: TextView = view.findViewById(R.id.gameDescription)

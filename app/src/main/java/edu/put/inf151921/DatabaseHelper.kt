@@ -47,7 +47,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getAllGames(): List<Game> {
         val gamesList = mutableListOf<Game>()
 
-        val selectQuery = "SELECT * FROM $TABLE_NAME"
+        val selectQuery = "SELECT * FROM $TABLE_NAME ORDER BY $COLUMN_NAME"
         val cursor = readableDatabase.rawQuery(selectQuery, null)
 
         cursor.use {
