@@ -16,7 +16,7 @@ class GameAdapter : RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_game, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_games, parent, false)
         return GameViewHolder(view)
     }
 
@@ -30,14 +30,14 @@ class GameAdapter : RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
     }
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val gameImage: ImageView = itemView.findViewById(R.id.gameImage)
+        //private val gameImage: ImageView = itemView.findViewById(R.id.gameImage)
         private val gameName: TextView = itemView.findViewById(R.id.gameName)
         private val gameDescription: TextView = itemView.findViewById(R.id.gameDescription)
         private val gameYearPublished: TextView = itemView.findViewById(R.id.gameYearPublished)
 
         fun bind(game: Game) {
             // Set the values of the views using the game object
-            gameImage.setImageResource(game.imageResId)
+            //gameImage.setImageResource(game.imageResId)
             gameName.text = game.name
             gameDescription.text = game.description
             gameYearPublished.text = "Year Published: ${game.yearPublished}"

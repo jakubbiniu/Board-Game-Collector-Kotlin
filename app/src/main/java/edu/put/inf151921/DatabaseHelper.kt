@@ -13,15 +13,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val TABLE_NAME = "games"
         private const val COLUMN_ID = "id"
         const val COLUMN_NAME = "name"
-        const val COLUMN_THUMBNAIL = "thumbnail"
-        const val COLUMN_IMAGE = "image"
         const val COLUMN_DESCRIPTION = "description"
         const val COLUMN_YEAR_PUBLISHED = "year_published"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_NAME TEXT, " +
-                "$COLUMN_THUMBNAIL TEXT, $COLUMN_IMAGE TEXT, $COLUMN_DESCRIPTION TEXT, $COLUMN_YEAR_PUBLISHED INTEGER)"
+        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID NUMBER PRIMARY KEY AUTOINCREMENT, $COLUMN_NAME VARCHAR, " +
+                "$COLUMN_DESCRIPTION VARCHAR, $COLUMN_YEAR_PUBLISHED NUMBER)"
         db.execSQL(createTableQuery)
     }
 

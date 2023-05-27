@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         else {
             setContentView(R.layout.activity_main)
             val hello: TextView = findViewById(R.id.hello)
-            hello.text = "Cześć, " + username.toString()
+            hello.text = "Hello, " + username.toString()
         }
     }
     fun reset(v: View){

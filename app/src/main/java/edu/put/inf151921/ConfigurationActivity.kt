@@ -60,18 +60,6 @@ class ConfigurationActivity : AppCompatActivity() {
                                         currentGame.name = name
                                     }
                                 }
-                                "thumbnail" -> {
-                                    val thumbnail = parser.getAttributeValue(null, "value")
-                                    if (!thumbnail.isNullOrBlank()) {
-                                        currentGame.thumbnail = thumbnail
-                                    }
-                                }
-                                "image" -> {
-                                    val image = parser.getAttributeValue(null, "value")
-                                    if (!image.isNullOrBlank()) {
-                                        currentGame.image = image
-                                    }
-                                }
                                 "description" -> {
                                     val description = parser.getAttributeValue(null, "value")
                                     if (!description.isNullOrBlank()) {
@@ -115,8 +103,6 @@ class ConfigurationActivity : AppCompatActivity() {
         games.forEach { game ->
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, game.name)
-            values.put(DatabaseHelper.COLUMN_THUMBNAIL, game.thumbnail)
-            values.put(DatabaseHelper.COLUMN_IMAGE, game.image)
             values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
             values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
             db.insert(DatabaseHelper.TABLE_NAME, null, values)
