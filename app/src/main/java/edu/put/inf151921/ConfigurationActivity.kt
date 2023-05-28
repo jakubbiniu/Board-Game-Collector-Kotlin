@@ -51,9 +51,16 @@ class ConfigurationActivity : AppCompatActivity() {
                 when (eventType) {
                     XmlPullParser.START_TAG -> {
                         val tagName = parser.name
-
                         if (tagName == "item") {
                             currentGame = Game()
+                            val objectId = parser.getAttributeValue(null, "objectid")
+                            if (!objectId.isNullOrBlank()) {
+                                currentGame.gameId = (objectId.toLongOrNull() ?: 0)
+                            }
+                            val subtype = parser.getAttributeValue(null, "subtype")
+                            if (!subtype.isNullOrBlank()) {
+                                currentGame.type = subtype
+                            }
                         } else if (currentGame != null) {
                             when (tagName) {
                                 "name" -> {
@@ -98,25 +105,42 @@ class ConfigurationActivity : AppCompatActivity() {
         return games
     }
 
-
-    private fun insertGamesIntoDatabase(games: List<Game>) {
-        val db = dbHelper.writableDatabase
-
-        games.forEach { game ->
-            val values = ContentValues()
-            values.put(DatabaseHelper.COLUMN_NAME, game.name)
-            values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
-            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
-            db.insert(DatabaseHelper.TABLE_NAME, null, values)
-        }
-
-        db.close()
-    }
     fun getCurrentDate(): String {
         val calendar = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
         return dateFormat.format(calendar.time)
     }
+    private fun insertGamesIntoDatabase(games: List<Game>, expansions: List<Game>) {
+        val db = dbHelper.writableDatabase
+
+        // Create the tables if they don't exist
+        dbHelper.onCreate(db)
+
+        // Insert games into the database
+        games.forEach { game ->
+            val values = ContentValues()
+            values.put(DatabaseHelper.COLUMN_NAME, game.name)
+            values.put(DatabaseHelper.COLUMN_GAME_ID, game.gameId)
+            values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
+            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
+            values.put(DatabaseHelper.COLUMN_TYPE, game.type)
+            db.insert(DatabaseHelper.TABLE_NAME, null, values)
+        }
+
+        // Insert expansions into the database
+        expansions.forEach { expansion ->
+            val values = ContentValues()
+            values.put(DatabaseHelper.COLUMN_NAME, expansion.name)
+            values.put(DatabaseHelper.COLUMN_GAME_ID, expansion.gameId)
+            values.put(DatabaseHelper.COLUMN_DESCRIPTION, expansion.description)
+            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, expansion.yearPublished)
+            values.put(DatabaseHelper.COLUMN_TYPE, expansion.type)
+            db.insert(DatabaseHelper.TABLE_NAME, null, values)
+        }
+
+        db.close()
+    }
+
     fun confirm(v: View) {
         val input: EditText = findViewById(R.id.username)
         val username: String = input.text.toString()
@@ -129,24 +153,28 @@ class ConfigurationActivity : AppCompatActivity() {
         cache.apply()
 
         GlobalScope.launch(Dispatchers.IO) {
-            val url = "https://boardgamegeek.com/xmlapi2/collection?username=$username&stats=1"
+            val gameUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgame&excludesubtype=boardgameexpansion"
+            val expansionUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgameexpansion"
             val client = OkHttpClient()
-            val request = Request.Builder()
-                .url(url)
-                .build()
+            val gameRequest = Request.Builder().url(gameUrl).build()
+            val expansionRequest = Request.Builder().url(expansionUrl).build()
 
-            var response: Response? = null
+            var gameResponse: Response? = null
+            var expansionResponse: Response? = null
 
             try {
-                response = client.newCall(request).execute()
-                val xmlResponse = response.body?.string()
+                gameResponse = client.newCall(gameRequest).execute()
+                val gameXmlResponse = gameResponse.body?.string()
 
-                if (xmlResponse != null) {
-                    val games = parseXmlResponse(xmlResponse)
+                expansionResponse = client.newCall(expansionRequest).execute()
+                val expansionXmlResponse = expansionResponse.body?.string()
 
-                    if (games.isNotEmpty()) {
-                        dbHelper.onCreate(dbHelper.writableDatabase)
-                        insertGamesIntoDatabase(games)
+                if (gameXmlResponse != null && expansionXmlResponse != null) {
+                    val games = parseXmlResponse(gameXmlResponse)
+                    val expansions = parseXmlResponse(expansionXmlResponse)
+
+                    if (games.isNotEmpty() || expansions.isNotEmpty()) {
+                        insertGamesIntoDatabase(games, expansions)
 
                         runOnUiThread {
                             showInfoMessage()
@@ -156,19 +184,29 @@ class ConfigurationActivity : AppCompatActivity() {
                         }
                     } else {
                         runOnUiThread {
-                            Toast.makeText(this@ConfigurationActivity, "No games found for the given username.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@ConfigurationActivity,
+                                "No games found for the given username.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this@ConfigurationActivity, "Failed to retrieve data from the server.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ConfigurationActivity,
+                            "Failed to retrieve data from the server.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
-                response?.body?.close()
+                gameResponse?.body?.close()
+                expansionResponse?.body?.close()
             }
         }
     }
+
 }

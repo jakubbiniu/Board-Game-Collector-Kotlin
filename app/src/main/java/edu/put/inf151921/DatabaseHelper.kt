@@ -13,15 +13,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         const val TABLE_NAME = "games"
         const val COLUMN_ID = "id"
+        const val COLUMN_GAME_ID = "game_id"
         const val COLUMN_NAME = "name"
         const val COLUMN_DESCRIPTION = "description"
         const val COLUMN_YEAR_PUBLISHED = "year_published"
+        const val COLUMN_TYPE = "type"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
         val createTableQuery = "CREATE TABLE $TABLE_NAME " +
-                "($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_YEAR_PUBLISHED INTEGER, $COLUMN_DESCRIPTION TEXT)"
+                "($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_GAME_ID LONG, " +
+                "$COLUMN_NAME TEXT, $COLUMN_YEAR_PUBLISHED INTEGER, $COLUMN_DESCRIPTION TEXT, $COLUMN_TYPE TEXT)"
         db.execSQL(createTableQuery)
     }
 
@@ -32,7 +35,21 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     fun getGamesCount(): Int {
         val db = this.readableDatabase
-        val cursor: Cursor? = db.rawQuery("SELECT COUNT(*) FROM $TABLE_NAME", null)
+        val cursor: Cursor? = db.rawQuery("SELECT COUNT(*) FROM $TABLE_NAME WHERE $COLUMN_TYPE='boardgame'", null)
+        var count = 0
+        cursor?.let {
+            if (it.moveToFirst()) {
+                count = cursor.getInt(0)
+            }
+            cursor.close()
+        }
+        db.close()
+        return count
+    }
+
+    fun getExpansionsCount(): Int {
+        val db = this.readableDatabase
+        val cursor: Cursor? = db.rawQuery("SELECT COUNT(*) FROM $TABLE_NAME WHERE $COLUMN_TYPE='boardgameexpansion'", null)
         var count = 0
         cursor?.let {
             if (it.moveToFirst()) {
@@ -47,20 +64,52 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getAllGames(): List<Game> {
         val gamesList = mutableListOf<Game>()
 
-        val selectQuery = "SELECT * FROM $TABLE_NAME ORDER BY $COLUMN_NAME"
+        val selectQuery = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_TYPE='boardgame'"
         val cursor = readableDatabase.rawQuery(selectQuery, null)
 
         cursor.use {
             while (cursor.moveToNext()) {
                 val id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
+                val gameId = cursor.getLong(cursor.getColumnIndex(COLUMN_GAME_ID))
                 val name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME))
                 val yearPublished = cursor.getInt(cursor.getColumnIndex(COLUMN_YEAR_PUBLISHED))
                 val description = cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION))
+                val type = cursor.getString(cursor.getColumnIndex(COLUMN_TYPE))
                 val game = Game()
                 game.id = id
+                game.gameId = gameId
                 game.name = name
                 game.yearPublished = yearPublished
                 game.description = description
+                game.type = type
+                gamesList.add(game)
+            }
+        }
+
+        return gamesList
+    }
+
+    fun getAllExpansions(): List<Game> {
+        val gamesList = mutableListOf<Game>()
+
+        val selectQuery = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_TYPE='boardgameexpansion'"
+        val cursor = readableDatabase.rawQuery(selectQuery, null)
+
+        cursor.use {
+            while (cursor.moveToNext()) {
+                val id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
+                val gameId = cursor.getLong(cursor.getColumnIndex(COLUMN_GAME_ID))
+                val name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME))
+                val yearPublished = cursor.getInt(cursor.getColumnIndex(COLUMN_YEAR_PUBLISHED))
+                val description = cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION))
+                val type = cursor.getString(cursor.getColumnIndex(COLUMN_TYPE))
+                val game = Game()
+                game.id = id
+                game.gameId = gameId
+                game.name = name
+                game.yearPublished = yearPublished
+                game.description = description
+                game.type = type
                 gamesList.add(game)
             }
         }

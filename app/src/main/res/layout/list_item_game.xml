@@ -28,7 +28,7 @@
         android:textColor="@color/white" />
 
     <TextView
-        android:id="@+id/gameDescription"
+        android:id="@+id/gameGameId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"

@@ -26,7 +26,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
             holder.gameId.text = game.id.toString()
             holder.gameName.text = game.name
             holder.yearPublished.text = game.yearPublished.toString()
-            holder.gameDescription.text=game.description
+            holder.gameGameId.text= game.gameId.toString()
         }
 
         return itemView!!
@@ -36,7 +36,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
         val gameId:TextView = view.findViewById(R.id.gameId)
         val gameName: TextView = view.findViewById(R.id.gameName)
         val yearPublished: TextView = view.findViewById(R.id.yearPublished)
-        val gameDescription: TextView = view.findViewById(R.id.gameDescription)
+        val gameGameId: TextView = view.findViewById(R.id.gameGameId)
 
     }
 }
