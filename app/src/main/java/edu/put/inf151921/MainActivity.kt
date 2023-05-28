@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
             val rowCount = dbHelper.getGamesCount()
             val expansionCount = dbHelper.getExpansionsCount()
 
+
             // Update the TextView with the number of rows
             val rowCountTextView: TextView = findViewById(R.id.gamesNumber)
             rowCountTextView.text = "Number of games: $rowCount"

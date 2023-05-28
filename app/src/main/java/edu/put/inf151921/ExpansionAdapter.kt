@@ -7,8 +7,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
-class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(context, 0, games) {
 
+class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(context, 0, games) {
+    var x:Int = 1
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var itemView = convertView
         val holder: ViewHolder
@@ -23,7 +24,8 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
 
         val game = getItem(position)
         game?.let {
-            holder.gameId.text = game.id.toString()
+            holder.gameId.text = x.toString()
+            x+=1
             holder.gameName.text = game.name
             holder.yearPublished.text = game.yearPublished.toString()
             //holder.gameGameId.text= game.gameId.toString()

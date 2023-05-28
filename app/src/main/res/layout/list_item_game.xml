@@ -3,32 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#2196F3"
-    android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/gameId"
-        android:layout_width="match_parent"
+        android:layout_width="52dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/gameName"
-        android:layout_width="match_parent"
+        android:layout_width="152dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/yearPublished"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="@color/white" />
-
-    <TextView
-        android:id="@+id/gameGameId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"
