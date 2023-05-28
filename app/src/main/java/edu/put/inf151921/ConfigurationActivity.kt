@@ -123,6 +123,8 @@ class ConfigurationActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
         return dateFormat.format(calendar.time)
     }
+
+
     private fun insertGamesIntoDatabase(games: List<Game>, expansions: List<Game>) {
         val db = dbHelper.writableDatabase
 
@@ -134,12 +136,38 @@ class ConfigurationActivity : AppCompatActivity() {
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, game.name)
             values.put(DatabaseHelper.COLUMN_GAME_ID, game.gameId)
-            values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
-            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
             values.put(DatabaseHelper.COLUMN_TYPE, game.type)
-            values.put(DatabaseHelper.COLUMN_IMAGE,game.image)
-            values.put(DatabaseHelper.COLUMN_THUMBNAIL,game.thumbnail)
-            db.insert(DatabaseHelper.TABLE_NAME, null, values)
+            values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
+            values.put(DatabaseHelper.COLUMN_IMAGE, game.image)
+            values.put(DatabaseHelper.COLUMN_THUMBNAIL, game.thumbnail)
+
+            // Retrieve game details from XML
+            val gameDetailsUrl = "https://www.boardgamegeek.com/xmlapi2/thing?id=${game.gameId}&stats=1"
+            val client = OkHttpClient()
+            val request = Request.Builder().url(gameDetailsUrl).build()
+
+            var response: Response? = null
+
+            try {
+                response = client.newCall(request).execute()
+                val xmlResponse = response.body?.string()
+
+                if (xmlResponse != null) {
+                    val (description, minPlayers, maxPlayers) = parseGameAttributesFromXml(xmlResponse)
+
+                    // Insert attributes into the database
+                    values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
+                    values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
+                    values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
+                }
+
+
+                db.insert(DatabaseHelper.TABLE_NAME, null, values)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } finally {
+                response?.body?.close()
+            }
         }
 
         // Insert expansions into the database
@@ -147,15 +175,87 @@ class ConfigurationActivity : AppCompatActivity() {
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, expansion.name)
             values.put(DatabaseHelper.COLUMN_GAME_ID, expansion.gameId)
-            values.put(DatabaseHelper.COLUMN_DESCRIPTION, expansion.description)
             values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, expansion.yearPublished)
             values.put(DatabaseHelper.COLUMN_TYPE, expansion.type)
-            values.put(DatabaseHelper.COLUMN_IMAGE,expansion.image)
-            values.put(DatabaseHelper.COLUMN_THUMBNAIL,expansion.thumbnail)
-            db.insert(DatabaseHelper.TABLE_NAME, null, values)
+            values.put(DatabaseHelper.COLUMN_IMAGE, expansion.image)
+            values.put(DatabaseHelper.COLUMN_THUMBNAIL, expansion.thumbnail)
+
+            val gameDetailsUrl = "https://www.boardgamegeek.com/xmlapi2/thing?id=${expansion.gameId}&stats=1"
+            val client = OkHttpClient()
+            val request = Request.Builder().url(gameDetailsUrl).build()
+
+            var response2: Response? = null
+
+            try {
+                response2 = client.newCall(request).execute()
+                val xmlResponse = response2.body?.string()
+
+                if (xmlResponse != null) {
+                    val (description, minPlayers, maxPlayers) = parseGameAttributesFromXml(xmlResponse)
+
+                    // Insert attributes into the database
+                    values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
+                    values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
+                    values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
+                }
+
+                db.insert(DatabaseHelper.TABLE_NAME, null, values)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } finally {
+                response2?.body?.close()
+            }
         }
 
         db.close()
+    }
+
+    private fun parseGameAttributesFromXml(xmlResponse: String?): Triple<String, Int, Int> {
+        var description = ""
+        var minPlayers = 0
+        var maxPlayers = 0
+
+        try {
+            val factory = XmlPullParserFactory.newInstance()
+            factory.isNamespaceAware = true
+            val parser: XmlPullParser = factory.newPullParser()
+            parser.setInput(StringReader(xmlResponse))
+
+            var eventType = parser.eventType
+            var insideDescriptionTag = false
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                when (eventType) {
+                    XmlPullParser.START_TAG -> {
+                        val tagName = parser.name
+                        if (tagName == "description") {
+                            insideDescriptionTag = true
+                        } else if (tagName == "minplayers") {
+                            val value = parser.getAttributeValue(null, "value")
+                            minPlayers = value?.toIntOrNull() ?: 0
+                        } else if (tagName == "maxplayers") {
+                            val value = parser.getAttributeValue(null, "value")
+                            maxPlayers = value?.toIntOrNull() ?: 0
+                        }
+                    }
+                    XmlPullParser.TEXT -> {
+                        val text = parser.text.trim()
+                        if (insideDescriptionTag) {
+                            description = text
+                            insideDescriptionTag = false
+                        }
+                    }
+                }
+
+                eventType = parser.next()
+            }
+        } catch (e: XmlPullParserException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return Triple(description, minPlayers, maxPlayers)
     }
 
     fun confirm(v: View) {
@@ -168,7 +268,11 @@ class ConfigurationActivity : AppCompatActivity() {
         cache.putString("username", username)
         cache.putString("synchroDate", currentDate)
         cache.apply()
-
+        Toast.makeText(
+            this@ConfigurationActivity,
+            "Loading in progress. This may take a while...",
+            Toast.LENGTH_LONG
+        ).show()
         GlobalScope.launch(Dispatchers.IO) {
             val gameUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgame&excludesubtype=boardgameexpansion"
             val expansionUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgameexpansion"

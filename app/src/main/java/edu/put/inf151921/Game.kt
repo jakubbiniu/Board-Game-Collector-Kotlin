@@ -9,6 +9,8 @@ class Game {
     var type:String =""
     var image:String=""
     var thumbnail:String=""
+    var min:Int = 0
+    var max:Int = 0
 
     constructor() {
         // Empty constructor
