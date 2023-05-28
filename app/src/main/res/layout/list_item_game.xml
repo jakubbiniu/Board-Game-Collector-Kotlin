@@ -11,10 +11,10 @@
             android:id="@+id/gameId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/white"
-            android:gravity="center" />
+            android:gravity="start" />
 
         <View
             android:layout_width="1dp"
@@ -37,7 +37,7 @@
             android:id="@+id/gameName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@android:color/white"
             android:gravity="center"
