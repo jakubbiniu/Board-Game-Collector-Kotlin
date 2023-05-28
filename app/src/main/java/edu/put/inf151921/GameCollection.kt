@@ -10,5 +10,9 @@ class GameCollection {
     fun getGamesList(): List<Game> {
         return games
     }
+
+    fun getSize():Int{
+        return games.size
+    }
 }
 

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.ContactsContract.Data
 import android.view.View
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -25,10 +26,11 @@ import java.util.*
 
 class ConfigurationActivity : AppCompatActivity() {
     private val dbHelper: DatabaseHelper by lazy { DatabaseHelper(this) }
-
+    private lateinit var progressBar: ProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configuration)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun showInfoMessage() {
@@ -130,9 +132,17 @@ class ConfigurationActivity : AppCompatActivity() {
 
         // Create the tables if they don't exist
         dbHelper.onCreate(db)
-
+        var progress=0
+        var total = games.size + expansions.size
+        var index = 0
         // Insert games into the database
         games.forEach { game ->
+            progress = ((index + 1) * 100) / total
+            index +=1
+            //runOnUiThread {
+            progressBar.setProgress(progress,true)
+            progressBar.contentDescription = "Synchronization progress: $progress%"
+            //}
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, game.name)
             values.put(DatabaseHelper.COLUMN_GAME_ID, game.gameId)
@@ -172,6 +182,12 @@ class ConfigurationActivity : AppCompatActivity() {
 
         // Insert expansions into the database
         expansions.forEach { expansion ->
+            progress = ((index + 1) * 100) / total
+            index +=1
+            //runOnUiThread {
+            progressBar.setProgress(progress,true)
+            progressBar.contentDescription = "Synchronization progress: $progress%"
+            //}
             val values = ContentValues()
             values.put(DatabaseHelper.COLUMN_NAME, expansion.name)
             values.put(DatabaseHelper.COLUMN_GAME_ID, expansion.gameId)
@@ -259,6 +275,7 @@ class ConfigurationActivity : AppCompatActivity() {
     }
 
     fun confirm(v: View) {
+        progressBar.visibility = View.VISIBLE
         val input: EditText = findViewById(R.id.username)
         val username: String = input.text.toString()
         val currentDate = getCurrentDate()
@@ -296,8 +313,15 @@ class ConfigurationActivity : AppCompatActivity() {
 
                     if (games.isNotEmpty() || expansions.isNotEmpty()) {
                         insertGamesIntoDatabase(games, expansions)
-
                         runOnUiThread {
+
+                            showInfoMessage()
+                        }
+                        runOnUiThread {
+                            val progress = 100
+                            progressBar.setProgress(progress,true)
+                            progressBar.contentDescription = "Synchronization progress: 100%"
+                            progressBar.visibility = View.GONE
                             showInfoMessage()
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             startActivity(intent)
