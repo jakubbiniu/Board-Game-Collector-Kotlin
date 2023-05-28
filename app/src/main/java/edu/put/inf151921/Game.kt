@@ -7,6 +7,8 @@ class Game {
     var description: String = ""
     var yearPublished: Int = 0
     var type:String =""
+    var image:String=""
+    var thumbnail:String=""
 
     constructor() {
         // Empty constructor

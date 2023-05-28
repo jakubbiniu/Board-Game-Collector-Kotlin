@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
+import com.squareup.picasso.Picasso
 
 
 class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(context, 0, games) {
@@ -28,7 +30,11 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
             x+=1
             holder.gameName.text = game.name
             holder.yearPublished.text = game.yearPublished.toString()
-            //holder.gameGameId.text= game.gameId.toString()
+            Picasso.get()
+                .load(game.thumbnail)
+                .placeholder(R.drawable.placeholder_image)
+                //.error(R.drawable.error_image)
+                .into(holder.imageThumbnail)
         }
 
         return itemView!!
@@ -38,6 +44,7 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
         val gameId:TextView = view.findViewById(R.id.gameId)
         val gameName: TextView = view.findViewById(R.id.gameName)
         val yearPublished: TextView = view.findViewById(R.id.yearPublished)
+        val imageThumbnail: ImageView = view.findViewById(R.id.imageThumbnail)
         //val gameGameId: TextView = view.findViewById(R.id.gameGameId)
 
     }

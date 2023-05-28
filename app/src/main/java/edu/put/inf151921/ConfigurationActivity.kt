@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -81,6 +82,18 @@ class ConfigurationActivity : AppCompatActivity() {
                                         currentGame.yearPublished = yearPublished.toIntOrNull() ?: 0
                                     }
                                 }
+                                "image" -> {
+                                    val image = parser.nextText()
+                                    if (!image.isNullOrBlank()) {
+                                        currentGame.image = image
+                                    }
+                                }
+                                "thumbnail" -> {
+                                    val thumbnail = parser.nextText()
+                                    if (!thumbnail.isNullOrBlank()) {
+                                        currentGame.thumbnail = thumbnail
+                                    }
+                                }
                             }
                         }
                     }
@@ -124,6 +137,8 @@ class ConfigurationActivity : AppCompatActivity() {
             values.put(DatabaseHelper.COLUMN_DESCRIPTION, game.description)
             values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, game.yearPublished)
             values.put(DatabaseHelper.COLUMN_TYPE, game.type)
+            values.put(DatabaseHelper.COLUMN_IMAGE,game.image)
+            values.put(DatabaseHelper.COLUMN_THUMBNAIL,game.thumbnail)
             db.insert(DatabaseHelper.TABLE_NAME, null, values)
         }
 
@@ -135,6 +150,8 @@ class ConfigurationActivity : AppCompatActivity() {
             values.put(DatabaseHelper.COLUMN_DESCRIPTION, expansion.description)
             values.put(DatabaseHelper.COLUMN_YEAR_PUBLISHED, expansion.yearPublished)
             values.put(DatabaseHelper.COLUMN_TYPE, expansion.type)
+            values.put(DatabaseHelper.COLUMN_IMAGE,expansion.image)
+            values.put(DatabaseHelper.COLUMN_THUMBNAIL,expansion.thumbnail)
             db.insert(DatabaseHelper.TABLE_NAME, null, values)
         }
 

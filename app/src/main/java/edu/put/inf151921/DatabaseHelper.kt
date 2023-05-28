@@ -18,13 +18,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_DESCRIPTION = "description"
         const val COLUMN_YEAR_PUBLISHED = "year_published"
         const val COLUMN_TYPE = "type"
+        const val COLUMN_IMAGE = "image"
+        const val COLUMN_THUMBNAIL = "thumbnail"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
         val createTableQuery = "CREATE TABLE $TABLE_NAME " +
                 "($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_GAME_ID LONG, " +
-                "$COLUMN_NAME TEXT, $COLUMN_YEAR_PUBLISHED INTEGER, $COLUMN_DESCRIPTION TEXT, $COLUMN_TYPE TEXT)"
+                "$COLUMN_NAME TEXT, $COLUMN_YEAR_PUBLISHED INTEGER, $COLUMN_DESCRIPTION TEXT, $COLUMN_TYPE TEXT,$COLUMN_IMAGE TEXT, $COLUMN_THUMBNAIL TEXT)"
         db.execSQL(createTableQuery)
     }
 
@@ -75,6 +77,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val yearPublished = cursor.getInt(cursor.getColumnIndex(COLUMN_YEAR_PUBLISHED))
                 val description = cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION))
                 val type = cursor.getString(cursor.getColumnIndex(COLUMN_TYPE))
+                val image = cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE))
+                val thumbnail = cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL))
                 val game = Game()
                 game.id = id
                 game.gameId = gameId
@@ -82,6 +86,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 game.yearPublished = yearPublished
                 game.description = description
                 game.type = type
+                game.image = image
+                game.thumbnail = thumbnail
                 gamesList.add(game)
             }
         }
@@ -103,6 +109,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val yearPublished = cursor.getInt(cursor.getColumnIndex(COLUMN_YEAR_PUBLISHED))
                 val description = cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION))
                 val type = cursor.getString(cursor.getColumnIndex(COLUMN_TYPE))
+                val image = cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE))
+                val thumbnail = cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL))
                 val game = Game()
                 game.id = id
                 game.gameId = gameId
@@ -110,6 +118,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 game.yearPublished = yearPublished
                 game.description = description
                 game.type = type
+                game.image = image
+                game.thumbnail = thumbnail
                 gamesList.add(game)
             }
         }
