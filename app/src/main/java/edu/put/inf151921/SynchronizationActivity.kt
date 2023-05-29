@@ -2,13 +2,16 @@ package edu.put.inf151921
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,10 +29,22 @@ import java.util.*
 class SynchronizationActivity : AppCompatActivity() {
     private val dbHelper: DatabaseHelper by lazy { DatabaseHelper(this) }
     private lateinit var progressBar: ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_synchronization)
         progressBar = findViewById(R.id.progressBar)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        var synchroDate = sharedPreferences.getString("synchroDate",null)
+        val date: TextView = findViewById(R.id.synDate)
+        date.text = "Last synchronization date: " + synchroDate.toString()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(applicationContext, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
     private fun showInfoMessage() {
         val message = "Database has been successfully updated"
@@ -228,7 +243,17 @@ class SynchronizationActivity : AppCompatActivity() {
 
         db.close()
     }
+    fun calculateTimeDifference(date1: String, date2: String): Long {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val dateTime1 = dateFormat.parse(date1)
+        val dateTime2 = dateFormat.parse(date2)
 
+        val diffInMillis = dateTime2.time - dateTime1.time
+
+        val hours: Long = diffInMillis / (1000 * 60 * 60)
+
+        return hours
+    }
     private fun parseGameAttributesFromXml(xmlResponse: String?): Triple<String, Int, Int> {
         var description = ""
         var minPlayers = 0
@@ -277,71 +302,101 @@ class SynchronizationActivity : AppCompatActivity() {
         return Triple(description, minPlayers, maxPlayers)
     }
     fun sycnhronize(v: View){
-        progressBar.visibility = View.VISIBLE
-
-
+        var currentDate = getCurrentDate()
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        var username = sharedPreferences.getString("username", null)
-        Toast.makeText(
-            this@SynchronizationActivity,
-            "Loading in progress. This may take a while...",
-            Toast.LENGTH_LONG
-        ).show()
-        GlobalScope.launch(Dispatchers.IO) {
-            val gameUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgame&excludesubtype=boardgameexpansion"
-            val expansionUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgameexpansion"
-            val client = OkHttpClient()
-            val gameRequest = Request.Builder().url(gameUrl).build()
-            val expansionRequest = Request.Builder().url(expansionUrl).build()
+        var synchroDate = sharedPreferences.getString("synchroDate",null)
+        var difference = synchroDate?.let { calculateTimeDifference(it,currentDate) }
+        if (difference != null) {
+            if (difference<24){
+                val dialogBuilder = AlertDialog.Builder(this)
+                dialogBuilder.setTitle("Last synchronization was less that 24 hours ago")
+                dialogBuilder.setMessage("Are you sure you want to do the synchronization?")
+                dialogBuilder.setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
+                    val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                    val cache = sharedPreferences.edit()
+                    cache.putString("synchroDate", currentDate)
+                    cache.apply()
+                    progressBar.visibility = View.VISIBLE
 
-            var gameResponse: Response? = null
-            var expansionResponse: Response? = null
 
-            try {
-                gameResponse = client.newCall(gameRequest).execute()
-                val gameXmlResponse = gameResponse.body?.string()
+                    //val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                    var username = sharedPreferences.getString("username", null)
+                    Toast.makeText(
+                        this@SynchronizationActivity,
+                        "Loading in progress. This may take a while...",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    GlobalScope.launch(Dispatchers.IO) {
+                        val gameUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgame&excludesubtype=boardgameexpansion"
+                        val expansionUrl = "https://boardgamegeek.com/xmlapi2/collection?username=$username&subtype=boardgameexpansion"
+                        val client = OkHttpClient()
+                        val gameRequest = Request.Builder().url(gameUrl).build()
+                        val expansionRequest = Request.Builder().url(expansionUrl).build()
 
-                expansionResponse = client.newCall(expansionRequest).execute()
-                val expansionXmlResponse = expansionResponse.body?.string()
+                        var gameResponse: Response? = null
+                        var expansionResponse: Response? = null
 
-                if (gameXmlResponse != null && expansionXmlResponse != null) {
-                    val games = parseXmlResponse(gameXmlResponse)
-                    val expansions = parseXmlResponse(expansionXmlResponse)
+                        try {
+                            gameResponse = client.newCall(gameRequest).execute()
+                            val gameXmlResponse = gameResponse.body?.string()
 
-                    if (games.isNotEmpty() || expansions.isNotEmpty()) {
-                        insertGamesIntoDatabase(games, expansions)
-                        runOnUiThread {
-                            val progress = 100
-                            progressBar.setProgress(progress,true)
-                            progressBar.contentDescription = "Synchronization progress: 100%"
-                            progressBar.visibility = View.GONE
-                            showInfoMessage()
+                            expansionResponse = client.newCall(expansionRequest).execute()
+                            val expansionXmlResponse = expansionResponse.body?.string()
+
+                            if (gameXmlResponse != null && expansionXmlResponse != null) {
+                                val games = parseXmlResponse(gameXmlResponse)
+                                val expansions = parseXmlResponse(expansionXmlResponse)
+
+                                if (games.isNotEmpty() || expansions.isNotEmpty()) {
+                                    insertGamesIntoDatabase(games, expansions)
+                                    runOnUiThread {
+                                        val progress = 100
+                                        progressBar.setProgress(progress,true)
+                                        progressBar.contentDescription = "Synchronization progress: 100%"
+                                        progressBar.visibility = View.GONE
+                                        showInfoMessage()
+                                        val intent = Intent(applicationContext, MainActivity::class.java)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+
+                                } else {
+                                    runOnUiThread {
+                                        Toast.makeText(
+                                            this@SynchronizationActivity,
+                                            "No games found for the given username.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            } else {
+                                runOnUiThread {
+                                    Toast.makeText(
+                                        this@SynchronizationActivity,
+                                        "Failed to retrieve data from the server.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        } finally {
+                            gameResponse?.body?.close()
+                            expansionResponse?.body?.close()
                         }
-
-                    } else {
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SynchronizationActivity,
-                                "No games found for the given username.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } else {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@SynchronizationActivity,
-                            "Failed to retrieve data from the server.",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                gameResponse?.body?.close()
-                expansionResponse?.body?.close()
+                dialogBuilder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int ->
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                dialogBuilder.show()
             }
+
         }
+
+
+
     }
 }

@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     fun synchronise(v: View){
         val intent = Intent(this, SynchronizationActivity::class.java)
         startActivity(intent)
+        finish()
     }
     fun viewGames(v: View){
         val intent = Intent(this, GamesActivity::class.java)
