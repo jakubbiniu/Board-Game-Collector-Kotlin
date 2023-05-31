@@ -30,7 +30,12 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
             holder.gameId.text = x.toString()
             x+=1
             holder.gameName.text = game.name
-            holder.yearPublished.text = game.yearPublished.toString()
+            if(game.yearPublished>0){
+                holder.yearPublished.text = game.yearPublished.toString()
+            }
+            else{
+                holder.yearPublished.text = "-"
+            }
             Picasso.get()
                 .load(game.thumbnail)
                 .placeholder(R.drawable.placeholder_image)

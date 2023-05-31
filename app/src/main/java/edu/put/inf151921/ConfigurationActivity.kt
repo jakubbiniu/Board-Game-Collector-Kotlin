@@ -231,54 +231,6 @@ class ConfigurationActivity : AppCompatActivity() {
     }
 
 
-
-//    private fun parseGameAttributesFromXml(xmlResponse: String?): Triple<String, Int, Int> {
-//        var description = ""
-//        var minPlayers = 0
-//        var maxPlayers = 0
-//
-//        try {
-//            val factory = XmlPullParserFactory.newInstance()
-//            factory.isNamespaceAware = true
-//            val parser: XmlPullParser = factory.newPullParser()
-//            parser.setInput(StringReader(xmlResponse))
-//
-//            var eventType = parser.eventType
-//            var insideDescriptionTag = false
-//
-//            while (eventType != XmlPullParser.END_DOCUMENT) {
-//                when (eventType) {
-//                    XmlPullParser.START_TAG -> {
-//                        val tagName = parser.name
-//                        if (tagName == "description") {
-//                            insideDescriptionTag = true
-//                        } else if (tagName == "minplayers") {
-//                            val value = parser.getAttributeValue(null, "value")
-//                            minPlayers = value?.toIntOrNull() ?: 0
-//                        } else if (tagName == "maxplayers") {
-//                            val value = parser.getAttributeValue(null, "value")
-//                            maxPlayers = value?.toIntOrNull() ?: 0
-//                        }
-//                    }
-//                    XmlPullParser.TEXT -> {
-//                        val text = parser.text.trim()
-//                        if (insideDescriptionTag) {
-//                            description = text
-//                            insideDescriptionTag = false
-//                        }
-//                    }
-//                }
-//
-//                eventType = parser.next()
-//            }
-//        } catch (e: XmlPullParserException) {
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        }
-//
-//        return Triple(description, minPlayers, maxPlayers)
-//    }
 private fun parseGameAttributesFromXml(xmlResponse: String?): Quadruple<String, Int, Int, Int> {
     var description = ""
     var minPlayers = 0

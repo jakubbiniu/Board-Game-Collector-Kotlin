@@ -28,11 +28,29 @@ class DetailsActivity : AppCompatActivity() {
         desc.text = "Description:\n" +
                 Html.fromHtml(description)
         val players:TextView = findViewById(R.id.playersTextView)
-        players.text = "Minimum number of players: $min\nMaximum number of players: $max"
+        if (min==0 || max==0){
+            players.text = "No information about number of players"
+        }
+        else{
+            players.text = "Minimum number of players: $min\nMaximum number of players: $max"
+        }
+
         val rankText:TextView = findViewById(R.id.rankTextView)
-        rankText.text = "Position in boardgames rank: $rank"
+        if (rank==0){
+            rankText.text = "No information about rank"
+        }
+        else{
+            rankText.text = "Position in boardgames rank: $rank"
+        }
+
         val yearText:TextView = findViewById(R.id.yearTextView)
-        yearText.text = "Release year: $year"
+        if(year==0){
+            yearText.text = "No information about year"
+        }
+        else{
+            yearText.text = "Release year: $year"
+        }
+
         Picasso.get()
             .load(image)
             .placeholder(R.drawable.placeholder_image)

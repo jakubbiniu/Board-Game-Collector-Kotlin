@@ -28,7 +28,13 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
         game?.let {
             holder.gameId.text = game.id.toString()
             holder.gameName.text = game.name
-            holder.yearPublished.text = game.yearPublished.toString()
+            if(game.yearPublished>0){
+                holder.yearPublished.text = game.yearPublished.toString()
+            }
+            else{
+                holder.yearPublished.text = "-"
+            }
+
 
             // Load the thumbnail image using Picasso library (add Picasso to your dependencies)
             Picasso.get()
