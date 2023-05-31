@@ -1,6 +1,7 @@
 package edu.put.inf151921
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,18 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
                 .placeholder(R.drawable.placeholder_image)
                 //.error(R.drawable.error_image)
                 .into(holder.imageThumbnail)
+            if (itemView != null) {
+                itemView.setOnClickListener(){
+                    val intent = Intent(context, DetailsActivity::class.java)
+                    intent.putExtra("image",game.image)
+                    intent.putExtra("name",game.name)
+                    intent.putExtra("description",game.description)
+                    intent.putExtra("min",game.min)
+                    intent.putExtra("max",game.max)
+                    intent.putExtra("year",game.yearPublished)
+                    context.startActivity(intent)
+                }
+            }
         }
 
         return itemView!!
