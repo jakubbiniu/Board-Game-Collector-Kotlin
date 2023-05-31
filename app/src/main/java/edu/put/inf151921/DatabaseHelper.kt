@@ -22,6 +22,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_THUMBNAIL = "thumbnail"
         const val COLUMN_MIN = "min"
         const val COLUMN_MAX = "max"
+        const val COLUMN_RANK = "rank"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -29,7 +30,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val createTableQuery = "CREATE TABLE $TABLE_NAME " +
                 "($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_GAME_ID LONG, " +
                 "$COLUMN_NAME TEXT, $COLUMN_YEAR_PUBLISHED INTEGER, $COLUMN_DESCRIPTION TEXT, $COLUMN_TYPE TEXT," +
-                "$COLUMN_IMAGE TEXT, $COLUMN_THUMBNAIL TEXT,$COLUMN_MIN INTEGER, $COLUMN_MAX INTEGER)"
+                "$COLUMN_IMAGE TEXT, $COLUMN_THUMBNAIL TEXT,$COLUMN_MIN INTEGER, $COLUMN_MAX INTEGER, $COLUMN_RANK INTEGER)"
         db.execSQL(createTableQuery)
     }
 
@@ -84,6 +85,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val thumbnail = cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL))
                 val min = cursor.getInt(cursor.getColumnIndex(COLUMN_MIN))
                 val max = cursor.getInt(cursor.getColumnIndex(COLUMN_MAX))
+                val rank = cursor.getInt(cursor.getColumnIndex(COLUMN_RANK))
                 val game = Game()
                 game.id = id
                 game.gameId = gameId
@@ -95,6 +97,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 game.thumbnail = thumbnail
                 game.min = min
                 game.max = max
+                game.rank = rank
                 gamesList.add(game)
             }
         }
@@ -120,6 +123,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val thumbnail = cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL))
                 val min = cursor.getInt(cursor.getColumnIndex(COLUMN_MIN))
                 val max = cursor.getInt(cursor.getColumnIndex(COLUMN_MAX))
+                val rank = cursor.getInt(cursor.getColumnIndex(COLUMN_RANK))
                 val game = Game()
                 game.id = id
                 game.gameId = gameId
@@ -131,6 +135,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 game.thumbnail = thumbnail
                 game.min = min
                 game.max = max
+                game.rank = rank
                 gamesList.add(game)
             }
         }

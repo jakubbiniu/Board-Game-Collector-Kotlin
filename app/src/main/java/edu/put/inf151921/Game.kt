@@ -11,6 +11,7 @@ class Game {
     var thumbnail:String=""
     var min:Int = 0
     var max:Int = 0
+    var rank:Int=0
 
     constructor() {
         // Empty constructor

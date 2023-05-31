@@ -24,6 +24,8 @@ import okhttp3.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+
 class ConfigurationActivity : AppCompatActivity() {
     private val dbHelper: DatabaseHelper by lazy { DatabaseHelper(this) }
     private lateinit var progressBar: ProgressBar
@@ -163,12 +165,13 @@ class ConfigurationActivity : AppCompatActivity() {
                 val xmlResponse = response.body?.string()
 
                 if (xmlResponse != null) {
-                    val (description, minPlayers, maxPlayers) = parseGameAttributesFromXml(xmlResponse)
+                    val (description, minPlayers, maxPlayers, rank) = parseGameAttributesFromXml(xmlResponse)
 
                     // Insert attributes into the database
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
+                    values.put(DatabaseHelper.COLUMN_RANK, rank)
                 }
 
 
@@ -207,12 +210,13 @@ class ConfigurationActivity : AppCompatActivity() {
                 val xmlResponse = response2.body?.string()
 
                 if (xmlResponse != null) {
-                    val (description, minPlayers, maxPlayers) = parseGameAttributesFromXml(xmlResponse)
+                    val (description, minPlayers, maxPlayers,rank) = parseGameAttributesFromXml(xmlResponse)
 
                     // Insert attributes into the database
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
+                    values.put(DatabaseHelper.COLUMN_RANK, rank)
                 }
 
                 db.insert(DatabaseHelper.TABLE_NAME, null, values)
@@ -226,53 +230,130 @@ class ConfigurationActivity : AppCompatActivity() {
         db.close()
     }
 
-    private fun parseGameAttributesFromXml(xmlResponse: String?): Triple<String, Int, Int> {
-        var description = ""
-        var minPlayers = 0
-        var maxPlayers = 0
 
-        try {
-            val factory = XmlPullParserFactory.newInstance()
-            factory.isNamespaceAware = true
-            val parser: XmlPullParser = factory.newPullParser()
-            parser.setInput(StringReader(xmlResponse))
 
-            var eventType = parser.eventType
-            var insideDescriptionTag = false
+//    private fun parseGameAttributesFromXml(xmlResponse: String?): Triple<String, Int, Int> {
+//        var description = ""
+//        var minPlayers = 0
+//        var maxPlayers = 0
+//
+//        try {
+//            val factory = XmlPullParserFactory.newInstance()
+//            factory.isNamespaceAware = true
+//            val parser: XmlPullParser = factory.newPullParser()
+//            parser.setInput(StringReader(xmlResponse))
+//
+//            var eventType = parser.eventType
+//            var insideDescriptionTag = false
+//
+//            while (eventType != XmlPullParser.END_DOCUMENT) {
+//                when (eventType) {
+//                    XmlPullParser.START_TAG -> {
+//                        val tagName = parser.name
+//                        if (tagName == "description") {
+//                            insideDescriptionTag = true
+//                        } else if (tagName == "minplayers") {
+//                            val value = parser.getAttributeValue(null, "value")
+//                            minPlayers = value?.toIntOrNull() ?: 0
+//                        } else if (tagName == "maxplayers") {
+//                            val value = parser.getAttributeValue(null, "value")
+//                            maxPlayers = value?.toIntOrNull() ?: 0
+//                        }
+//                    }
+//                    XmlPullParser.TEXT -> {
+//                        val text = parser.text.trim()
+//                        if (insideDescriptionTag) {
+//                            description = text
+//                            insideDescriptionTag = false
+//                        }
+//                    }
+//                }
+//
+//                eventType = parser.next()
+//            }
+//        } catch (e: XmlPullParserException) {
+//            e.printStackTrace()
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
+//
+//        return Triple(description, minPlayers, maxPlayers)
+//    }
+private fun parseGameAttributesFromXml(xmlResponse: String?): Quadruple<String, Int, Int, Int> {
+    var description = ""
+    var minPlayers = 0
+    var maxPlayers = 0
+    var rankValue = 0
 
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                when (eventType) {
-                    XmlPullParser.START_TAG -> {
-                        val tagName = parser.name
-                        if (tagName == "description") {
-                            insideDescriptionTag = true
-                        } else if (tagName == "minplayers") {
-                            val value = parser.getAttributeValue(null, "value")
-                            minPlayers = value?.toIntOrNull() ?: 0
-                        } else if (tagName == "maxplayers") {
-                            val value = parser.getAttributeValue(null, "value")
-                            maxPlayers = value?.toIntOrNull() ?: 0
-                        }
+    try {
+        val factory = XmlPullParserFactory.newInstance()
+        factory.isNamespaceAware = true
+        val parser: XmlPullParser = factory.newPullParser()
+        parser.setInput(StringReader(xmlResponse))
+
+        var eventType = parser.eventType
+        var insideDescriptionTag = false
+        var insideRankTag = false
+        var insideRatingsTag = false
+        var insideStatisticsTag = false
+        var insideRanksTag =false
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            when (eventType) {
+                XmlPullParser.START_TAG -> {
+                    val tagName = parser.name
+                    if (tagName == "description") {
+                        insideDescriptionTag = true
+                    } else if (tagName == "minplayers") {
+                        val value = parser.getAttributeValue(null, "value")
+                        minPlayers = value?.toIntOrNull() ?: 0
+                    } else if (tagName == "maxplayers") {
+                        val value = parser.getAttributeValue(null, "value")
+                        maxPlayers = value?.toIntOrNull() ?: 0
+                    } else if (tagName == "rank" && insideRanksTag && parser.getAttributeValue(null, "type") == "subtype" && parser.getAttributeValue(null, "name") == "boardgame") {
+                        val value =  parser.getAttributeValue(null, "value")
+                        rankValue = value?.toIntOrNull() ?: 0
+                    } else if (tagName == "ratings" && insideStatisticsTag) {
+                        insideRatingsTag = true
+                    } else if (tagName == "statistics") {
+                        insideStatisticsTag = true
                     }
-                    XmlPullParser.TEXT -> {
-                        val text = parser.text.trim()
-                        if (insideDescriptionTag) {
-                            description = text
-                            insideDescriptionTag = false
-                        }
+                    else if (tagName=="ranks" && insideRatingsTag){
+                        insideRanksTag=true
                     }
                 }
-
-                eventType = parser.next()
+                XmlPullParser.TEXT -> {
+                    val text = parser.text.trim()
+                    if (insideDescriptionTag) {
+                        description = text
+                        insideDescriptionTag = false
+                    }
+                }
+                XmlPullParser.END_TAG -> {
+                    val tagName = parser.name
+                    if (tagName == "ratings") {
+                        insideRatingsTag = false
+                    } else if (tagName == "statistics") {
+                        insideStatisticsTag = false
+                    }
+                    else if (tagName == "ranks"){
+                        insideRanksTag=false
+                    }
+                }
             }
-        } catch (e: XmlPullParserException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
 
-        return Triple(description, minPlayers, maxPlayers)
+            eventType = parser.next()
+        }
+    } catch (e: XmlPullParserException) {
+        e.printStackTrace()
+    } catch (e: IOException) {
+        e.printStackTrace()
     }
+
+    return Quadruple(description, minPlayers, maxPlayers, rankValue)
+}
+
+
 
     fun confirm(v: View) {
         progressBar.visibility = View.VISIBLE

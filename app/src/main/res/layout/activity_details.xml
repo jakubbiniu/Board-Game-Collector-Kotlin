@@ -38,10 +38,18 @@
             android:paddingTop="8dp" />
 
         <TextView
+            android:id="@+id/rankTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp" />
+
+        <TextView
             android:id="@+id/descriptionTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp" />
+
+
 
     </LinearLayout>
 </ScrollView>
