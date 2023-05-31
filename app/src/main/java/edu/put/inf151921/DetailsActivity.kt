@@ -24,10 +24,10 @@ class DetailsActivity : AppCompatActivity() {
         val title:TextView = findViewById(R.id.titleTextView)
         title.text = name
         val desc:TextView = findViewById(R.id.descriptionTextView)
-        desc.text = "Description: " +
+        desc.text = "Description:\n" +
                 Html.fromHtml(description)
         val players:TextView = findViewById(R.id.playersTextView)
-        players.text = "Minimum number of players: $min, maximum: $max"
+        players.text = "Minimum number of players: $min\nMaximum number of players: $max"
         val yearText:TextView = findViewById(R.id.yearTextView)
         yearText.text = "Release year: $year"
         Picasso.get()
@@ -38,12 +38,5 @@ class DetailsActivity : AppCompatActivity() {
 
 
 
-
-
-
-
-
-
-        // Add more code to display other game details as needed
     }
 }
