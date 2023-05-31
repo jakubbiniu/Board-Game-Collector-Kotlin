@@ -17,7 +17,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         var username = sharedPreferences.getString("username", null)
-        if (username == null) {
+        if (username=="user"){
+            username=null
+        }
+        if (username.isNullOrEmpty()) {
             val intent = Intent(this, ConfigurationActivity::class.java)
             startActivity(intent)
             finish()
