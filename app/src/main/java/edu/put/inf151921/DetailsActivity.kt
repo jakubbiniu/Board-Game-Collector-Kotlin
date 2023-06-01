@@ -98,7 +98,6 @@ class DetailsActivity : AppCompatActivity() {
     fun addPhoto(view: View) {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
-
     }
 
     private fun createImageFile(): File {
@@ -200,9 +199,10 @@ class DetailsActivity : AppCompatActivity() {
                     // Photo from gallery selected successfully
                     val selectedImageUri: Uri? = data?.data
                     selectedImageUri?.let {
-                        val selectedImagePath = getPathFromUri(it)
+                        val selectedImagePath = getRealPathFromUri(it)
                         selectedImagePath?.let { path ->
                             gamePhotoPaths.add(path)
+                            photoAdapter.notifyDataSetChanged() // Notify the adapter that data has changed
                         }
                     }
                 }

@@ -12,8 +12,10 @@ import com.squareup.picasso.Picasso
 
 
 class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(context, 0, games) {
+
     var x:Int = 1
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+
         var itemView = convertView
         val holder: ViewHolder
 
@@ -27,8 +29,8 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
 
         val game = getItem(position)
         game?.let {
-            holder.gameId.text = x.toString()
-            x+=1
+            holder.gameId.text = (position+1).toString()
+            //x+=1
             holder.gameName.text = game.name
             if(game.yearPublished>0){
                 holder.yearPublished.text = game.yearPublished.toString()

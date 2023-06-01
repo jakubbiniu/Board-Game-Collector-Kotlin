@@ -16,10 +16,10 @@ class PhotoAdapter(private val photoPaths: ArrayList<String>) : RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        // Load a local image file
-        val localImagePath = "/path/to/local/image.jpg"
-        Picasso.get().load(File(localImagePath)).into(holder.imageView)
+        val photoPath = photoPaths[position]
+        Picasso.get().load(File(photoPath)).into(holder.imageView)
     }
+
 
 
     override fun getItemCount(): Int {

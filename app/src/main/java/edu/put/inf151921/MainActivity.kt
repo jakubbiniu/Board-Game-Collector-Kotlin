@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
             // Update the TextView with the number of rows
             val rowCountTextView: TextView = findViewById(R.id.gamesNumber)
             rowCountTextView.text = "Number of games: $rowCount"
+
+
             val expansionCountTextView:TextView = findViewById(R.id.extensionNumber)
             expansionCountTextView.text = "Number of expansions: $expansionCount"
         }

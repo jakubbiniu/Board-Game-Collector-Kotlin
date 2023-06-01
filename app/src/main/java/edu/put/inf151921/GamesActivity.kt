@@ -1,6 +1,5 @@
 package edu.put.inf151921
 
-
 import android.os.Bundle
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
