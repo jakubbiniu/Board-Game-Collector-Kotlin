@@ -6,12 +6,31 @@ import android.text.Html
 import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.view.View
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class DetailsActivity : AppCompatActivity() {
+    private lateinit var currentPhotoPath: String
+    private lateinit var gamePhotoPaths: ArrayList<String>
+    private lateinit var photoAdapter: PhotoAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
+
+        gamePhotoPaths = ArrayList()
 
         val image = intent.getStringExtra("image")
         val name = intent.getStringExtra("name")
@@ -56,8 +75,159 @@ class DetailsActivity : AppCompatActivity() {
             .placeholder(R.drawable.placeholder_image)
             //.error(R.drawable.error_image)
             .into(picture)
+        photoAdapter = PhotoAdapter(gamePhotoPaths)
+    }
+
+    fun seePhotos(view: View) {
+        // Start a new activity or dialog to display the list of photos
+        val intent = Intent(this, PhotosActivity::class.java)
+        intent.putStringArrayListExtra("photoPaths", gamePhotoPaths)
+        startActivity(intent)
+    }
 
 
+    fun takePhoto(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkCameraPermission()) {
+            requestCameraPermission()
+        } else {
+            dispatchTakePictureIntent()
+        }
+        gamePhotoPaths.add(currentPhotoPath)
+    }
 
+    fun addPhoto(view: View) {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
+
+    }
+
+    private fun createImageFile(): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = getExternalFilesDir(null)
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    ex.printStackTrace()
+                    null
+                }
+                photoFile?.also {
+                    val photoUri: Uri = FileProvider.getUriForFile(
+                        this,
+                        "edu.put.inf151921.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE)
+                }
+            }
+        }
+    }
+
+    // Helper function to get the real file path from a content URI
+    private fun getRealPathFromUri(uri: Uri): String? {
+        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, filePathColumn, null, null, null)
+        cursor?.moveToFirst()
+        val columnIndex = cursor?.getColumnIndex(filePathColumn[0])
+        val filePath = cursor?.getString(columnIndex!!)
+        cursor?.close()
+        return filePath
+    }
+
+
+    private fun checkCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CAMERA),
+            CAMERA_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission granted
+                dispatchTakePictureIntent()
+            } else {
+                // Camera permission denied
+                // Handle the denial gracefully or request permission again
+            }
+        }
+    }
+
+
+    private fun getPathFromUri(uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                return it.getString(columnIndex)
+            }
+        }
+        return null
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                CAMERA_REQUEST_CODE -> {
+                    // Photo from camera captured successfully
+                    gamePhotoPaths.add(currentPhotoPath)
+                }
+                GALLERY_REQUEST_CODE -> {
+                    // Photo from gallery selected successfully
+                    val selectedImageUri: Uri? = data?.data
+                    selectedImageUri?.let {
+                        val selectedImagePath = getPathFromUri(it)
+                        selectedImagePath?.let { path ->
+                            gamePhotoPaths.add(path)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getRealPathFromURI(uri: Uri?): String? {
+        uri?.let {
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            val cursor = contentResolver.query(it, projection, null, null, null)
+            cursor?.use {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                if (it.moveToFirst()) {
+                    return it.getString(columnIndex)
+                }
+            }
+        }
+        return null
+    }
+
+
+    companion object {
+        private const val CAMERA_REQUEST_CODE = 1
+        private const val GALLERY_REQUEST_CODE = 2
+        private const val CAMERA_PERMISSION_REQUEST_CODE = 3
     }
 }

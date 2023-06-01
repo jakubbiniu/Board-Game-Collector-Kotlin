@@ -25,6 +25,36 @@
             android:scaleType="centerCrop"
             android:src="@drawable/placeholder_image" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cameraAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="takePhoto"
+                android:text="Take a photo" />
+
+            <Button
+                android:id="@+id/galleryAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="addPhoto"
+                android:text="Add from gallery" />
+
+            <Button
+                android:id="@+id/seePhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="seePhotos"
+                android:text="Watch photos" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/yearTextView"
             android:layout_width="match_parent"
