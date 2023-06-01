@@ -30,7 +30,7 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
         val game = getItem(position)
         game?.let {
             holder.gameId.text = (position+1).toString()
-            //x+=1
+
             holder.gameName.text = game.name
             if(game.yearPublished>0){
                 holder.yearPublished.text = game.yearPublished.toString()
@@ -41,7 +41,7 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
             Picasso.get()
                 .load(game.thumbnail)
                 .placeholder(R.drawable.placeholder_image)
-                //.error(R.drawable.error_image)
+
                 .into(holder.imageThumbnail)
             if (itemView != null) {
                 itemView.setOnClickListener(){
@@ -67,7 +67,7 @@ class ExpansionAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>
         val gameName: TextView = view.findViewById(R.id.gameName)
         val yearPublished: TextView = view.findViewById(R.id.yearPublished)
         val imageThumbnail: ImageView = view.findViewById(R.id.imageThumbnail)
-        //val gameGameId: TextView = view.findViewById(R.id.gameGameId)
+
 
     }
 }

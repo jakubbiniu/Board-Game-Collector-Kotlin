@@ -7,7 +7,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -166,7 +165,7 @@ class SynchronizationActivity : AppCompatActivity() {
             values.put(DatabaseHelper.COLUMN_IMAGE, game.image)
             values.put(DatabaseHelper.COLUMN_THUMBNAIL, game.thumbnail)
 
-            // Retrieve game details from XML
+
             val gameDetailsUrl = "https://www.boardgamegeek.com/xmlapi2/thing?id=${game.gameId}&stats=1"
             val client = OkHttpClient()
             val request = Request.Builder().url(gameDetailsUrl).build()
@@ -180,7 +179,7 @@ class SynchronizationActivity : AppCompatActivity() {
                 if (xmlResponse != null) {
                     val (description, minPlayers, maxPlayers, rank) = parseGameAttributesFromXml(xmlResponse)
 
-                    // Insert attributes into the database
+
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
@@ -196,7 +195,7 @@ class SynchronizationActivity : AppCompatActivity() {
             }
         }
 
-        // Insert expansions into the database
+
         expansions.forEach { expansion ->
             progress = ((index + 1) * 100) / total
             index +=1
@@ -228,7 +227,7 @@ class SynchronizationActivity : AppCompatActivity() {
                 if (xmlResponse != null) {
                     val (description, minPlayers, maxPlayers,rank) = parseGameAttributesFromXml(xmlResponse)
 
-                    // Insert attributes into the database
+
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
@@ -347,7 +346,7 @@ class SynchronizationActivity : AppCompatActivity() {
                     progressBar.visibility = View.VISIBLE
 
 
-                    //val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
                     var username = sharedPreferences.getString("username", null)
                     Toast.makeText(
                         this@SynchronizationActivity,

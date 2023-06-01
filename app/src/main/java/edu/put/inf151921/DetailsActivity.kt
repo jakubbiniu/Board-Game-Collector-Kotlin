@@ -73,7 +73,7 @@ class DetailsActivity : AppCompatActivity() {
         Picasso.get()
             .load(image)
             .placeholder(R.drawable.placeholder_image)
-            //.error(R.drawable.error_image)
+
             .into(picture)
 
         photoAdapter = PhotoAdapter(gamePhotoPaths){ position ->
@@ -156,15 +156,7 @@ class DetailsActivity : AppCompatActivity() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
     }
-//    fun addPhoto(view: View) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkStoragePermission()) {
-//            requestStoragePermission()
-//        } else {
-//            createGameFolder()
-//            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//            startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
-//        }
-//    }
+
     private fun checkStoragePermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
@@ -218,11 +210,11 @@ class DetailsActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 CAMERA_REQUEST_CODE -> {
-                    // Photo from camera captured successfully
+
                     saveImageFile(Uri.fromFile(File(currentPhotoPath)), gameId)
                 }
                 GALLERY_REQUEST_CODE -> {
-                    // Photo from gallery selected successfully
+
                     val selectedImageUri: Uri? = data?.data
                     selectedImageUri?.let {
                         saveImageFile(it, gameId)
@@ -234,7 +226,7 @@ class DetailsActivity : AppCompatActivity() {
 
 
     fun seePhotos(view: View) {
-        // Start a new activity or dialog to display the list of photos
+
         val intent = Intent(this, PhotosActivity::class.java)
         intent.putStringArrayListExtra("photoPaths", gamePhotoPaths)
         intent.putExtra("gameId",gameId)

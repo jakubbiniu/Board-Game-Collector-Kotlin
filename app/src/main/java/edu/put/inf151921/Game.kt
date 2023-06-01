@@ -17,13 +17,5 @@ class Game {
         // Empty constructor
     }
 
-    constructor(name: String) {
-        this.name = name
-    }
 
-
-
-    fun add(collection: GameCollection) {
-        collection.addGame(this)
-    }
 }

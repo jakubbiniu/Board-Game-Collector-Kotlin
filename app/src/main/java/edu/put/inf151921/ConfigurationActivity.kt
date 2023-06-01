@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.ContactsContract.Data
 import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -132,12 +131,12 @@ class ConfigurationActivity : AppCompatActivity() {
     private fun insertGamesIntoDatabase(games: List<Game>, expansions: List<Game>) {
         val db = dbHelper.writableDatabase
 
-        // Create the tables if they don't exist
+
         dbHelper.onCreate(db)
         var progress=0
         var total = games.size + expansions.size
         var index = 0
-        // Insert games into the database
+
         games.forEach { game ->
             progress = ((index + 1) * 100) / total
             index +=1
@@ -153,7 +152,7 @@ class ConfigurationActivity : AppCompatActivity() {
             values.put(DatabaseHelper.COLUMN_IMAGE, game.image)
             values.put(DatabaseHelper.COLUMN_THUMBNAIL, game.thumbnail)
 
-            // Retrieve game details from XML
+
             val gameDetailsUrl = "https://www.boardgamegeek.com/xmlapi2/thing?id=${game.gameId}&stats=1"
             val client = OkHttpClient()
             val request = Request.Builder().url(gameDetailsUrl).build()
@@ -167,7 +166,7 @@ class ConfigurationActivity : AppCompatActivity() {
                 if (xmlResponse != null) {
                     val (description, minPlayers, maxPlayers, rank) = parseGameAttributesFromXml(xmlResponse)
 
-                    // Insert attributes into the database
+
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)
@@ -183,7 +182,7 @@ class ConfigurationActivity : AppCompatActivity() {
             }
         }
 
-        // Insert expansions into the database
+
         expansions.forEach { expansion ->
             progress = ((index + 1) * 100) / total
             index +=1
@@ -212,7 +211,7 @@ class ConfigurationActivity : AppCompatActivity() {
                 if (xmlResponse != null) {
                     val (description, minPlayers, maxPlayers,rank) = parseGameAttributesFromXml(xmlResponse)
 
-                    // Insert attributes into the database
+
                     values.put(DatabaseHelper.COLUMN_DESCRIPTION, description)
                     values.put(DatabaseHelper.COLUMN_MIN, minPlayers)
                     values.put(DatabaseHelper.COLUMN_MAX, maxPlayers)

@@ -36,11 +36,11 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
             }
 
 
-            // Load the thumbnail image using Picasso library (add Picasso to your dependencies)
+
             Picasso.get()
                 .load(game.thumbnail)
                 .placeholder(R.drawable.placeholder_image)
-                //.error(R.drawable.error_image)
+
                 .into(holder.imageThumbnail)
             if (itemView != null) {
                 itemView.setOnClickListener(){
@@ -67,7 +67,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
         val gameName: TextView = view.findViewById(R.id.gameName)
         val yearPublished: TextView = view.findViewById(R.id.yearPublished)
         val imageThumbnail:ImageView = view.findViewById(R.id.imageThumbnail)
-        //val gameGameId: TextView = view.findViewById(R.id.gameGameId)
+
 
     }
 }

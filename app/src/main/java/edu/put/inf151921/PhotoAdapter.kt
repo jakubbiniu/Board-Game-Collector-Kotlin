@@ -31,7 +31,7 @@ class PhotoAdapter(
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
 
         init {
-            // Add long press listener to delete the photo
+
             itemView.setOnLongClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
