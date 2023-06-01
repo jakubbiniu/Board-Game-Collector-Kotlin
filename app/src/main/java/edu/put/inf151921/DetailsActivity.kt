@@ -76,7 +76,9 @@ class DetailsActivity : AppCompatActivity() {
             //.error(R.drawable.error_image)
             .into(picture)
 
-        photoAdapter = PhotoAdapter(gamePhotoPaths)
+        photoAdapter = PhotoAdapter(gamePhotoPaths){ position ->
+            0
+        }
     }
 
     private fun createGameFolder() {

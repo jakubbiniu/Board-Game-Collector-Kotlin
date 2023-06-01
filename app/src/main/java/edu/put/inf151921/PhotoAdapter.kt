@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import java.io.File
 
-class PhotoAdapter(private val photoPaths: ArrayList<String>) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
+class PhotoAdapter(
+    private val photoPaths: ArrayList<String>,
+    private val onDeletePhoto: (Int) -> Unit
+) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_photo, parent, false)
@@ -20,13 +23,22 @@ class PhotoAdapter(private val photoPaths: ArrayList<String>) : RecyclerView.Ada
         Picasso.get().load(File(photoPath)).into(holder.imageView)
     }
 
-
-
     override fun getItemCount(): Int {
         return photoPaths.size
     }
 
     inner class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
+
+        init {
+            // Add long press listener to delete the photo
+            itemView.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onDeletePhoto(position)
+                }
+                true
+            }
+        }
     }
 }
