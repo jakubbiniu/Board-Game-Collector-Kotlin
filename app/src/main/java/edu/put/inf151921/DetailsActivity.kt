@@ -92,7 +92,7 @@ class DetailsActivity : AppCompatActivity() {
         } else {
             dispatchTakePictureIntent()
         }
-        gamePhotoPaths.add(currentPhotoPath)
+        //gamePhotoPaths.add(currentPhotoPath)
     }
 
     fun addPhoto(view: View) {
