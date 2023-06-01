@@ -52,6 +52,7 @@ class GameAdapter(context: Context, games: List<Game>) : ArrayAdapter<Game>(cont
                     intent.putExtra("max",game.max)
                     intent.putExtra("year",game.yearPublished)
                     intent.putExtra("rank",game.rank)
+                    intent.putExtra("gameId",game.gameId)
                     context.startActivity(intent)
                 }
             }
