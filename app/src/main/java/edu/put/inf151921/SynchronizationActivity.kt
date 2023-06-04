@@ -334,9 +334,9 @@ class SynchronizationActivity : AppCompatActivity() {
         var synchroDate = sharedPreferences.getString("synchroDate",null)
         var difference = synchroDate?.let { calculateTimeDifference(it,currentDate) }
         if (difference != null) {
-            if (difference<24){
+            if (1==1){
                 val dialogBuilder = AlertDialog.Builder(this)
-                dialogBuilder.setTitle("Last synchronization was less that 24 hours ago")
+                dialogBuilder.setTitle("Confirm")
                 dialogBuilder.setMessage("Are you sure you want to do the synchronization?")
                 dialogBuilder.setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
                     val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
